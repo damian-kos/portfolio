@@ -1,0 +1,58 @@
+{% include "header.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+<!-- Page Header -->
+<header class="masthead" style="background-image: url('/static/img/{{post.title}}_banner.svg')">
+  <div class="overlay"></div>
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 col-md-10 mx-auto">
+        <div class="post-heading">
+          <h1>{{post.title}}</h1>
+          <h2 class="subheading">{{post.subtitle}}</h2>
+          <span class="meta">Posted by
+            <a href="#">{{post.author.name}}</a>
+            on {{post.date}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Post Content -->
+
+<article>
+
+  <div class="container">
+
+    <div class="with-github-icon row">
+      <a id="btn-back-to-top" href="{{ post.img_url }}">
+        <span class="fa-stack fa-lg">
+          <i class="fas fa-circle fa-stack-2x"></i>
+          <i class="fab fa-github fa-stack-1x fa-inverse"></i>
+        </span>
+      </a>
+
+      <div class="article col-lg-8 col-md-10 z-0 mx-auto">
+
+
+        <!--          |safe allows to post to be free of html signs-->
+        {{ post.body|safe }}
+
+        <hr>
+
+
+        {% if current_user.id == 1 %}
+        <div class="clearfix">
+          <a class="btn btn-primary float-right" href="{{url_for('edit_post', post_id=post.id)}}">Edit Post</a>
+        </div>
+        {% endif %}
+
+      </div>
+
+    </div>
+  </div>
+</article>
+
+<hr>
+{% include "footer.html" %}
