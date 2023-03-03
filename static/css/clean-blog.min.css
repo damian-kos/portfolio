@@ -543,6 +543,10 @@ footer .copyright {
     }
 }
 
+.card {
+    margin-bottom: 10px;
+}
+
 @media only screen and (min-width:768px) {
     #btn-back-to-top {
         position: relative !important;
