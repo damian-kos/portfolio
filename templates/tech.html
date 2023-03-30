@@ -7,9 +7,9 @@
     <div class="row">
       <div class="col-lg-8 col-md-10 mx-auto">
         <div class="site-heading">
-          <h1>Projects
+          <h1>Repairs & Guides
           </h1>
-          <span class="subheading">Exploring the power of Python</span>
+          <span class="subheading">Tech repair and maintenance for modern devices</span>
         </div>
       </div>
     </div>
@@ -28,7 +28,7 @@
         <div class="card-body">
           <h2 class="price-text">{{post.title}}</h2>
           <p>{{post.subtitle}}</p>
-          <a class="btn btn-secondary btn-sm rounded" href="{{ url_for('show_post', post_id=post.id) }}"
+          <a class="btn btn-secondary btn-sm rounded" href="{{ url_for('show_tech_post', post_id=post.id) }}"
             type="button">Take a
             look</a>
           {% if current_user.id == 1 %}
