@@ -71,19 +71,8 @@ class BlogPost(db.Model):
     date = db.Column(db.String(250), nullable=False)
     body = db.Column(db.Text, nullable=False)
     img_url = db.Column(db.String(250), nullable=False)
+    post_type = db.Column(db.String(250), nullable=False)
 
-
-class TechPost(db.Model):
-    __tablename__ = "tech_posts"
-    id = db.Column(db.Integer, primary_key=True)
-    author_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    author = relationship("User", back_populates="tech")
-    # comments = relationship("Comment", back_populates="parent_post")
-    title = db.Column(db.String(250), unique=True, nullable=False)
-    subtitle = db.Column(db.String(250), nullable=False)
-    date = db.Column(db.String(250), nullable=False)
-    body = db.Column(db.Text, nullable=False)
-    img_url = db.Column(db.String(250), nullable=False)
 
 
 # User
@@ -91,25 +80,11 @@ class User(UserMixin, db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     posts = relationship("BlogPost", back_populates="author")
-    tech = relationship("TechPost", back_populates="author")
+  
 
     name = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(250), unique=True, nullable=False)
     password = db.Column(db.String(250), nullable=False)
-
-
-# Comment
-# class Comment(db.Model):
-#     __tablename__ = "comments"
-#     id = db.Column(db.Integer, primary_key=True)
-
-#     author_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-#     author = relationship("User", back_populates="comments")
-
-#     parent_id = db.Column(db.Integer, db.ForeignKey("blog_posts.id"))
-#     parent_post = relationship("BlogPost", back_populates="comments")
-
-#     text = db.Column(db.Text, nullable=False)
 
 
 # with app.app_context():
@@ -119,15 +94,15 @@ class User(UserMixin, db.Model):
 @app.route("/")
 def get_all_posts():
     # Gets all posts from blog_posts table
-    posts = BlogPost.query.all()
+    posts = BlogPost.query.filter_by(post_type="blog").all()
+
     return render_template("index.html", all_posts=posts)
 
 
 @app.route("/tech_posts")
 def get_all_tech():
     # Gets all posts from tech_posts table
-    posts = TechPost.query.all()
-    print(posts)
+    posts = BlogPost.query.filter_by(post_type="tech").all()
     return render_template("tech.html", all_posts=posts)
 
 
@@ -208,12 +183,6 @@ def show_post(post_id):
     return render_template("post.html", post=requested_post)
 
 
-@app.route("/tech_post/<int:post_id>", methods=["GET", "POST"])
-def show_tech_post(post_id):
-    requested_post = TechPost.query.get(post_id)
-    return render_template("post.html", post=requested_post)
-
-
 @app.route("/about")
 def about():
     return render_template("about.html")
@@ -244,24 +213,15 @@ def send_email(name, email, message):
 def add_new_post():
     form = CreatePostForm()
     if form.validate_on_submit():
-        if form.post_type.data == "blog":
-            new_post = BlogPost(
-                title=form.title.data,
-                subtitle=form.subtitle.data,
-                body=form.body.data,
-                img_url=form.img_url.data,
-                author=current_user,
-                date=date.today().strftime("%B %d, %Y"),
-            )
-        else:
-            new_post = TechPost(
-                title=form.title.data,
-                subtitle=form.subtitle.data,
-                body=form.body.data,
-                img_url=form.img_url.data,
-                author=current_user,
-                date=date.today().strftime("%B %d, %Y"),
-            )
+        new_post = BlogPost(
+            title=form.title.data,
+            subtitle=form.subtitle.data,
+            body=form.body.data,
+            img_url=form.img_url.data,
+            author=current_user,
+            date=date.today().strftime("%B %d, %Y"),
+            post_type=form.post_type.data,
+        )
         db.session.add(new_post)
         db.session.commit()
         return redirect(url_for("get_all_posts"))
@@ -271,6 +231,8 @@ def add_new_post():
 @app.route("/edit-post/<int:post_id>", methods=["GET", "POST"])
 @admin_only
 def edit_post(post_id):
+    post_type_from_url = request.args.get('post_type_from_url')
+    print(f"POST TYPE: {post_type_from_url}")
     post = BlogPost.query.get(post_id)
     edit_form = CreatePostForm(
         title=post.title,
@@ -278,6 +240,7 @@ def edit_post(post_id):
         img_url=post.img_url,
         author=post.author,
         body=post.body,
+        post_type=post.post_type,
     )
     if edit_form.validate_on_submit():
         post.title = edit_form.title.data
@@ -285,6 +248,7 @@ def edit_post(post_id):
         post.img_url = edit_form.img_url.data
         post.author = current_user
         post.body = edit_form.body.data
+        post.post_type = edit_form.post_type.data
         db.session.commit()
         return redirect(url_for("show_post", post_id=post.id))
     return render_template("make-post.html", form=edit_form)

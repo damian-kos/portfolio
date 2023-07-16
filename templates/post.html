@@ -44,7 +44,10 @@
 
         {% if current_user.id == 1 %}
         <div class="clearfix">
-          <a class="btn btn-primary float-right" href="{{url_for('edit_post', post_id=post.id)}}">Edit Post</a>
+<input type="hidden" name="post_type" value="{{ post.post_type }}">
+
+          <a class="btn btn-primary float-right" href="{{url_for('edit_post', post_id=post.id, post_type_from_url=post.post_type)}}">Edit Post {{post.post_type}}</a>
+          <!-- Add this hidden form field -->
         </div>
         {% endif %}
 
