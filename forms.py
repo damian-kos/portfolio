@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, PasswordField, SelectField
+from wtforms import StringField, SubmitField, PasswordField, SelectField, IntegerField
 from wtforms.validators import DataRequired, URL, Email
 from flask_ckeditor import CKEditorField
 
@@ -15,6 +15,8 @@ class CreatePostForm(FlaskForm):
         choices=[("tech", "Tech Post"), ("blog", "Blog Post")],
         validators=[DataRequired()],
     )
+    post_sorting_position = IntegerField("Post Position",validators=[DataRequired()])
+
     submit = SubmitField("Submit Post")
 
 
