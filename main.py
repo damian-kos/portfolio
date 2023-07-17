@@ -75,13 +75,11 @@ class BlogPost(db.Model):
     post_sorting_position = db.Column(db.Integer)
 
 
-
 # User
 class User(UserMixin, db.Model):
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     posts = relationship("BlogPost", back_populates="author")
-  
 
     name = db.Column(db.String(250), nullable=False)
     email = db.Column(db.String(250), unique=True, nullable=False)
@@ -95,17 +93,18 @@ class User(UserMixin, db.Model):
 @app.route("/")
 def get_all_posts():
     # Gets all posts from blog_posts table
-    posts = BlogPost.query.filter_by(post_type="blog").order_by(BlogPost.post_sorting_position.desc()).all()
+    posts = BlogPost.query.filter_by(post_type="blog").order_by(
+        BlogPost.post_sorting_position.desc()).all()
 
-
-
-    return render_template("index.html", all_posts=posts)
+    return render_template("index.html",
+                           all_posts=posts)
 
 
 @app.route("/tech_posts")
 def get_all_tech():
     # Gets all posts from tech_posts table
-    posts = BlogPost.query.filter_by(post_type="tech").order_by(BlogPost.post_sorting_position.desc()).all()
+    posts = BlogPost.query.filter_by(post_type="tech").order_by(
+        BlogPost.post_sorting_position.desc()).all()
 
     return render_template("tech.html", all_posts=posts)
 
@@ -225,7 +224,7 @@ def add_new_post():
             author=current_user,
             date=date.today().strftime("%B %d, %Y"),
             post_type=form.post_type.data,
-            post_sorting_position = form.post_sorting_position.data,
+            post_sorting_position=form.post_sorting_position.data,
         )
         db.session.add(new_post)
         db.session.commit()
@@ -246,7 +245,7 @@ def edit_post(post_id):
         author=post.author,
         body=post.body,
         post_type=post.post_type,
-        post_sorting_position = post.post_sorting_position,
+        post_sorting_position=post.post_sorting_position,
 
     )
     if edit_form.validate_on_submit():
